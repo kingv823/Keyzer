@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     const userAgent = req.headers['user-agent'] || '';
     
     // 1. TON LIEN GITHUB RAW
-    const scriptUrl = "https://raw.githubusercontent.com/kingv823/assets/main/script.lua";
+    const scriptUrl = "https://raw.githubusercontent.com/kingv823/assets/main/script.la";
     
     // 2. TON LIEN DE VIDÉO DISCORD
     const videoUrl = "https://cdn.discordapp.com/attachments/1469866758684020759/1487808525076795644/ssstik.io_mouss.69.1_1774791576239.mp4?ex=69ca7d2a&is=69c92baa&hm=1973888711e318815e7d8918d78bc639688adf0bda5a50d64eda614a1f9921f1&";
