@@ -2,7 +2,7 @@ export default async function handler(req, res) {
     // On récupère l'identité (User-Agent)
     const userAgent = req.headers['user-agent'] || '';
     
-    // 1. TON LIEN GITHUB RAW
+    // 1. TON LIEN GITHUB RAW (Modifié plus bas pour briser le cache)
     const scriptUrl = "https://raw.githubusercontent.com/kingv823/assets/main/script.lua";
     
     // 2. TON LIEN DE VIDÉO DISCORD
@@ -11,9 +11,23 @@ export default async function handler(req, res) {
     // VÉRIFICATION : Est-ce que c'est Roblox ou un exécuteur ?
     if (userAgent.toLowerCase().includes('roblox') || userAgent.toLowerCase().includes('rblx')) {
         try {
-            // C'est Roblox ! On récupère le code sur GitHub
-            const response = await fetch(scriptUrl);
+            // FIX ANTI-CACHE : On ajoute un timestamp unique (?v=...) pour forcer GitHub à donner la version fraîche
+            const bypassUrl = scriptUrl + "?v=" + Date.now();
+            
+            // On désactive aussi explicitement le cache dans les headers du fetch
+            const response = await fetch(bypassUrl, {
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            });
             const data = await response.text();
+            
+            // On dit à l'exécuteur Roblox de ne SURTOUT PAS garder ce script en cache
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
             
             res.setHeader('Content-Type', 'text/plain');
             return res.status(200).send(data);
@@ -53,7 +67,6 @@ export default async function handler(req, res) {
                         transform: translate(-50%, -50%);
                         object-fit: cover;
                     }
-                    /* Message discret au cas où l'autoplay galère */
                     .overlay {
                         position: absolute;
                         color: rgba(255,255,255,0.2);
@@ -74,7 +87,6 @@ export default async function handler(req, res) {
                 <script>
                     const video = document.getElementById('troll');
                     
-                    // Fonction pour activer le son au premier clic
                     function enableSound() {
                         if (video.muted) {
                             video.muted = false;
@@ -82,7 +94,6 @@ export default async function handler(req, res) {
                         }
                     }
 
-                    // On essaie de forcer le play au cas où
                     document.addEventListener('DOMContentLoaded', () => {
                         video.play().catch(e => console.log("Autoplay blocked, waiting for click"));
                     });
